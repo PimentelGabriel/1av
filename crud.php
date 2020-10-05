@@ -2,15 +2,15 @@
 session_start();
 
 # conecta com o BD
-$server = 'localhost';
-$user = 'root';
-$psw = '';
-$dbase = 'loja';
+// $server = 'localhost';
+// $user = 'root';
+// $psw = '';
+// $dbase = 'loja';
 
-// $server = 'sql313.epizy.com';
-// $user = 'epiz_26890237';
-// $psw = 'TvD58e0zmR5FH88';
-// $dbase = 'epiz_26890237_loja';
+$server = 'sql313.epizy.com';
+$user = 'epiz_26890237';
+$psw = 'TvD58e0zmR5FH88';
+$dbase = 'epiz_26890237_loja';
 
 $db = mysqli_connect($server, $user, $psw, $dbase);
 
@@ -32,19 +32,25 @@ if(isset($_POST['close-db'])){
 
 # adiciona produto
 if (isset($_POST['adiciona'])) {
-
     $nome = $_POST['nome'];
     $descricao = $_POST['descricao'];
     $qtdEstoque = $_POST['qtd-estoque'];
     $precoUnitario = $_POST['preco-unitario'];
     $ptoReposicao = $_POST['pto-reposicao'];
 
-    mysqli_query($db, "INSERT INTO produtos (nome, descricao, qtdEstoque, precoUnitario, ptoReposicao) VALUE ('$nome', '$descricao', '$qtdEstoque', '$precoUnitario', '$ptoReposicao')");
-    
-    //mysqli_query($db, "INSERT INTO produtos (nome, descricao) VALUES ('$nome', '$descricao')");
+    if(filter_input(INPUT_POST, 'nome') &&
+        filter_input(INPUT_POST, 'descricao') &&
+        filter_input(INPUT_POST, 'qtd-estoque', FILTER_VALIDATE_INT) &&
+        filter_input(INPUT_POST, 'preco-unitario', FILTER_VALIDATE_FLOAT) &&
+        filter_input(INPUT_POST, 'pto-reposicao', FILTER_VALIDATE_INT)
+    ){
+        mysqli_query($db, "INSERT INTO produtos (nome, descricao, qtdEstoque, precoUnitario, ptoReposicao) VALUE ('$nome', '$descricao', '$qtdEstoque', '$precoUnitario', '$ptoReposicao')");
 
-    # grava mensagem na sessão
-    $_SESSION['message'] = "Produto adicionado!";
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Produto adicionado!";
+    }else{
+        $_SESSION['message'] = "Erro: O produto não foi adicionado!";
+    }
     header('location: produtos.php');
 }
 
@@ -57,12 +63,18 @@ if (isset($_POST['altera'])) {
     $precoUnitario = $_POST['preco-unitario'];
     $ptoReposicao = $_POST['pto-reposicao'];
 
-    print_r($_POST);
-
-    mysqli_query($db, "UPDATE produtos SET nome ='$nome', descricao = '$descricao', qtdEstoque = '$qtdEstoque', precoUnitario = '$precoUnitario', ptoReposicao = '$ptoReposicao' WHERE id = '$id'");
-
-    # grava mensagem na sessão
-    $_SESSION['message'] = "Produto alterado!";
+    if(filter_input(INPUT_POST, 'nome') &&
+        filter_input(INPUT_POST, 'descricao') &&
+        filter_input(INPUT_POST, 'qtd-estoque', FILTER_VALIDATE_INT) &&
+        filter_input(INPUT_POST, 'preco-unitario', FILTER_VALIDATE_FLOAT) &&
+        filter_input(INPUT_POST, 'pto-reposicao', FILTER_VALIDATE_INT)
+    ){
+        mysqli_query($db, "UPDATE produtos SET nome ='$nome', descricao = '$descricao', qtdEstoque = '$qtdEstoque', precoUnitario = '$precoUnitario', ptoReposicao = '$ptoReposicao' WHERE id = '$id'");
+        $_SESSION['message'] = "Produto alterado!";
+    }else{
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Erro: O produto não foi alterado!";
+    }
     header('location: produtos.php');
 }
 
