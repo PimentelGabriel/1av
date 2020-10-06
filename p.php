@@ -1,5 +1,6 @@
 <?php 
-include('crud.php');
+include('./conexao/conexao.php');
+include('./php/crudClientes.php');
 
 
 # recupera o registro para edição
@@ -63,11 +64,11 @@ if (isset($_GET['edit'])) {
         <!-- Início while -->
         <?php while ($rs = mysqli_fetch_array($results)) { ?>
         <tr>
-            <td><?php echo $rs['nomecli']; ?></td>
-            <td><?php echo $rs['endercli']; ?></td>
+            <td><?php echo $rs['nome']; ?></td>
+            <td><?php echo $rs['descricao']; ?></td>
             
-            <td><?php echo $rs['fonecli']?></td>
-            <td><?php echo $rs['emailcli']?></td>
+            <td><?php echo $rs['qtdEstoque']?></td>
+            <td>R$ <?php echo number_format($rs['precoUnitario'], 2, ',', '.')?></td>
             <td><?php echo $rs['ptoReposicao']?></td>
 
             <td>

@@ -1,21 +1,32 @@
 <?php 
-include('crud.php');
 
+//include('./php/conexao.php');
+include('./php/crudClientes.php');
+
+#iniciando variveis
+$nome = "";
+$descricao = "";
+$id = 0;
+$update = false;
+
+$nomecli = "";
+$endercli = "";
+$fonecli = "";
+$emailcli = "";
 
 # recupera o registro para edição
 if (isset($_GET['edit'])) {
-    $id = $_GET['edit'];
+    $idcli = $_GET['edit'];
     $update = true;
-    $record = mysqli_query($db, "SELECT * FROM produtos WHERE id=$id");
+    $record = mysqli_query($db, "SELECT * FROM clientes WHERE idcli=$idcli");
     # testa o retorno do select e cria o vetor com os registros trazidos
 
     if ($record) {
         $n = mysqli_fetch_array($record);
-        $nome = $n['nome'];
-        $descricao = $n['descricao'];
-        $qtdEstoque = $n['qtdEstoque'];
-        $precoUnitario = $n['precoUnitario'];
-        $ptoReposicao = $n['ptoReposicao'];
+        $nomecli = $n['nomecli'];
+        $endercli = $n['endercli'];
+        $fonecli = $n['fonecli'];
+        $emailcli = $n['emailcli'];
     }
 }
 ?>
@@ -47,34 +58,35 @@ if (isset($_GET['edit'])) {
     <!-- ------------------------------------------------- -->
 
     <!-- recupera os registros do banco de dados e exibe na página -->
-    <?php $results = mysqli_query($db, "SELECT * FROM produtos"); ?>
+    <?php 
+        $rsSelect = mysqli_query($db, "SELECT * FROM clientes");
+    ?>
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Nome</th>
-                <th>Descrição</th>
-                <th>Qtd. em Estoque</th>
-                <th>Preço Unitário</th>
-                <th>Qtd p/ Reposição</th>
+                <th>Endereço</th>
+                <th>Fone</th>
+                <th>Email</th>
                 <th colspan="2">Ação</th>
             </tr>
         </thead>
         <!-- cria o vetor com os registros trazidos do select -->
         <!-- Início while -->
-        <?php while ($rs = mysqli_fetch_array($results)) { ?>
+        <?php while ($rs = mysqli_fetch_array($rsSelect)) { ?>
         <tr>
+            <td><?php echo $rs['idcli']; ?></td>
             <td><?php echo $rs['nomecli']; ?></td>
-            <td><?php echo $rs['endercli']; ?></td>
-            
-            <td><?php echo $rs['fonecli']?></td>
+            <td><?php echo $rs['endercli']?></td>
+            <td><?php echo $rs['fonecli'] ?></td>
             <td><?php echo $rs['emailcli']?></td>
-            <td><?php echo $rs['ptoReposicao']?></td>
 
             <td>
-                <a href="produtos.php?edit=<?php echo $rs['id']; ?>" class="edit_btn">Alterar</a>
+                <a href="clientes.php?edit=<?php echo $rs['idcli']; ?>" class="edit_btn">Alterar</a>
             </td>
             <td>
-                <a href="crud.php?del=<?php echo $rs['id']; ?>" class="del_btn">Remover</a>
+                <a href="./php/crudClientes.php?del=<?php echo $rs['idcli']; ?>" class="del_btn">Remover</a>
             </td>
         </tr>
         <?php } ?>
@@ -82,29 +94,25 @@ if (isset($_GET['edit'])) {
     </table>
     <!-- ------------------------------------------------------------ -->
 
-    <form method="post" action="crud.php">
+    <form method="post" action="./php/crudClientes.php">
         <!-- campo oculto - contem o id do registro que vai ser atualizado -->
-        <input type="hidden" name="id" value="<?php echo $id; ?>">
+        <input type="hidden" name="idcli" value="<?php echo $id; ?>">
         
         <div class="input-group">
-            <label>Produto</label>
-            <input type="text" name="nome" value="<?php echo $nome; ?>">
+            <label>Nome</label>
+            <input type="text" name="nomecli" value="<?php echo $nomecli; ?>">
         </div>
         <div class="input-group">
-            <label>Descrição</label>
-            <input type="text" name="descricao" value="<?php echo $descricao; ?>">
+            <label>Endereço</label>
+            <input type="text" name="endercli" value="<?php echo $endercli; ?>">
         </div>
         <div class="input-group">
-            <label>Qtd. Estoque</label>
-            <input type="number" name="qtd-estoque" value="<?php echo $qtdEstoque; ?>">
+            <label>Telefone</label>
+            <input type="text" name="fonecli" value="<?php echo $fonecli; ?>">
         </div>
         <div class="input-group">
-            <label>Preço Unitário</label>
-            <input type="number" name="preco-unitario" value="<?php echo $precoUnitario; ?>">
-        </div>
-        <div class="input-group">
-            <label>Qtd p/ Reposição</label>
-            <input type="number" name="pto-reposicao" value="<?php echo $ptoReposicao; ?>">
+            <label>E-mail</label>
+            <input type="text" name="emailcli" value="<?php echo $emailcli; ?>">
         </div>
         <div class="input-group">
             <!-- <button class="btn" type="submit" name="adiciona">Adicionar</button> -->
@@ -119,13 +127,6 @@ if (isset($_GET['edit'])) {
             <a ><input type="submit" class="btn" name="close-db" value="VOLTAR AO MENU"></a>
         </div>
     </form>
-    <script>
-        function mudaAction(){
-            document.querySelector("form[action='crud.php']").removeAttribute('action');
-            document.querySelector("form[action='crud.php']").setAttribute('action', 'closeDb.php');
-
-        }
-    </script>
 </body>
 
 </html>

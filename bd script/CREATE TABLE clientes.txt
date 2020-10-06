@@ -1,0 +1,7 @@
+CREATE TABLE clientes(
+    idcli int(5) not null primary key AUTO_INCREMENT,
+    nomecli varchar(50) not null,
+    endercli varchar(100) not null,
+    fonecli varchar(15) not null,
+    emailcli varchar(50) not null
+);
