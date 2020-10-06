@@ -1,7 +1,7 @@
 <?php 
 
 //include('./php/conexao.php');
-include('./php/crudClientes.php');
+include('./php/crudVendas.php');
 
 #iniciando variveis
 $nome = "";
@@ -18,7 +18,7 @@ $emailcli = "";
 if (isset($_GET['edit'])) {
     $idcli = $_GET['edit'];
     $update = true;
-    $record = mysqli_query($db, "SELECT * FROM clientes WHERE idcli=$idcli");
+    $record = mysqli_query($db, "SELECT * FROM vendas WHERE idcli=$idcli");
     # testa o retorno do select e cria o vetor com os registros trazidos
 
     if ($record) {
@@ -64,11 +64,11 @@ if (isset($_GET['edit'])) {
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Endereço</th>
-                <th>Fone</th>
-                <th>Email</th>
+                <th>Cod.</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Total</th>
                 <th colspan="2">Ação</th>
             </tr>
         </thead>
@@ -99,19 +99,23 @@ if (isset($_GET['edit'])) {
         <input type="hidden" name="idcli" value="<?php echo $id; ?>">
         
         <div class="input-group">
-            <label>Nome</label>
+            <label>Cod.</label>
             <input type="text" name="nomecli" value="<?php echo $nomecli; ?>">
         </div>
         <div class="input-group">
-            <label>Endereço</label>
+            <label>Cliente</label>
             <input type="text" name="endercli" value="<?php echo $endercli; ?>">
         </div>
         <div class="input-group">
-            <label>Telefone</label>
+            <label>Produto</label>
             <input type="text" name="fonecli" value="<?php echo $fonecli; ?>">
         </div>
         <div class="input-group">
-            <label>E-mail</label>
+            <label>Quantidade</label>
+            <input type="text" name="emailcli" value="<?php echo $emailcli; ?>">
+        </div>
+        <div class="input-group">
+            <label>Total</label>
             <input type="text" name="emailcli" value="<?php echo $emailcli; ?>">
         </div>
         <div class="input-group">
