@@ -5,7 +5,7 @@
 # dsn - Data source name - nome da fonte de dados
 
 # $dns = '<tipoDB> :host= <localhost> ; dbame = <nomeDB>';
-$dsn = "mysql:host=localhost;dbname=vendas";
+$dsn = "mysql:host=localhost;dbname=loja";
 $user = "root";
 $senha = "";
 

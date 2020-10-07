@@ -6,7 +6,7 @@ session_start();
 $server = 'localhost';
 $user = 'root';
 $psw = '';
-$dbase = 'vendas';
+$dbase = 'loja';
 
 // $server = 'sql313.epizy.com';
 // $user = 'epiz_26890237';
@@ -15,6 +15,8 @@ $dbase = 'vendas';
 
 $db = mysqli_connect($server, $user, $psw, $dbase);
 
+$_SESSION['db'] = $db;
+
 //print_r($db);
 
 # inicializa variáveis
@@ -22,9 +24,9 @@ $nomecli = "";
 $endercli = "";
 $id = 0;
 $update = false;
-$qtdEstoque = 0;
-$precoUnitario = 0.0;
-$ptoReposicao = 0;
+$idcli = "";
+$idprod = "";
+$qtdven = "";
 
 #testa se close db foi acionado
 
@@ -35,55 +37,87 @@ if(isset($_POST['close-db'])){
 
 # adiciona Cliente
 if (isset($_POST['adiciona'])) {
-    $nomecli = $_POST['nomecli'];
-    $endercli = $_POST['endercli'];
-    $fonecli = $_POST['fonecli'];
-    $emailcli = $_POST['emailcli'];
+    $idcli = $_POST['idcli'];
+    $idprod = $_POST['idprod'];
+    $qtdven = $_POST['qtdven'];
 
-    if(filter_input(INPUT_POST, 'nomecli') &&
-        filter_input(INPUT_POST, 'endercli') &&
-        filter_input(INPUT_POST, 'fonecli') &&
-        filter_input(INPUT_POST, 'emailcli')
+    if(filter_input(INPUT_POST, 'idcli') &&
+        filter_input(INPUT_POST, 'idprod') &&
+        filter_input(INPUT_POST, 'qtdven')
     ){
-        mysqli_query($db, "INSERT INTO clientes (nomecli, endercli, fonecli, emailcli) VALUE ('$nomecli', '$endercli', '$fonecli', '$emailcli')");
+        if(verEstoque($idprod, $qtdven)){    
+            updateEstoque($idprod, $qtdven);
+        
+            mysqli_query($db, "INSERT INTO vendas (idcli, idprod, qtdVen) VALUE ('$idcli', '$idprod', '$qtdven')");
 
-        # grava mensagem na sessão
-        $_SESSION['message'] = "Cliente adicionado!";
+            # grava mensagem na sessão
+            $_SESSION['message'] = "Venda efetuada!";
+        }else{
+            $_SESSION['message'] = "Estoque insuficiente!";
+        }
     }else{
-        $_SESSION['message'] = "Erro: O Cliente não foi adicionado!";
+        $_SESSION['message'] = "Erro: Venda não efetuada!";
     }
-    //header('location: ../clientes.php');
+    //header('location: ./../vendas.php');
 }
 
 # altera Cliente
 if (isset($_POST['altera'])) {
+    
+    $codven = $_POST['codven'];
+    echo "CodVen: ".$codven."<p>";
     $idcli = $_POST['idcli'];
-    $nomecli = $_POST['nomecli'];
-    $endercli = $_POST['endercli'];
-    $fonecli = $_POST['fonecli'];
-    $emailcli = $_POST['emailcli'];
+    $idprod = $_POST['idprod'];
+    $qtdven = $_POST['qtdven'];
 
-    if(filter_input(INPUT_POST, 'nomecli') &&
-        filter_input(INPUT_POST, 'endercli') &&
-        filter_input(INPUT_POST, 'fonecli') &&
-        filter_input(INPUT_POST, 'emailcli')
+    if(filter_input(INPUT_POST, 'codven', FILTER_VALIDATE_INT) &&
+        filter_input(INPUT_POST, 'idcli', FILTER_VALIDATE_INT) &&
+        filter_input(INPUT_POST, 'idprod', FILTER_VALIDATE_INT) &&
+        filter_input(INPUT_POST, 'qtdven', FILTER_VALIDATE_INT)
     ){
-        mysqli_query($db, "UPDATE clientes SET nomecli ='$nomecli', endercli = '$endercli', fonecli = '$fonecli', emailcli = '$emailcli' WHERE idcli = '$idcli'");
+        print_r(mysqli_query($db, "UPDATE vendas SET idcli = '$idcli', idprod = '$idprod', qtdVen = '$qtdven' WHERE codven = '$codven'"));
         $_SESSION['message'] = "Cliente alterado!";
     }else{
         # grava mensagem na sessão
         $_SESSION['message'] = "Erro: O Cliente não foi alterado!";
     }
-    //header('location: ../clientes.php');
+    header('location: ./../vendas.php');
 }
 
 # remove Cliente
 if (isset($_GET['del'])) {
-    $idcli = $_GET['del'];
-    mysqli_query($db, "DELETE FROM clientes WHERE idcli=$idcli");
+    $id = $_GET['del'];
+    mysqli_query($_SESSION['db'], "DELETE FROM vendas WHERE codven=$id");
 
     # grava mensagem na sessão
-    $_SESSION['message'] = "Cliente removido!";
+    $_SESSION['message'] = "Venda Cancelada!";
         
-    //header('location: ../clientes.php');
+    header('location: ./../vendas.php');
+}
+
+
+// ____ __ __ __  __   ___ ______ __   ___   __  __  __ 
+// ||    || || ||\ ||  //   | || | ||  // \\  ||\ || (( \
+// ||==  || || ||\\|| ((      ||   || ((   )) ||\\||  \\ 
+// ||    \\_// || \||  \\__   ||   ||  \\_//  || \|| \_))
+//
+
+
+#Atualização do BD quando realizada a venda
+function verEstoque($id, $qtdven){
+    $query = "SELECT qtdEstoque FROM produtos WHERE id =".$id;
+    $rsSelect = mysqli_query($_SESSION['db'], $query);
+    $rs = mysqli_fetch_array($rsSelect);
+    
+    return ((int)$rs > $qtdven) ? false : true;
+}
+
+function updateEstoque($id, $qtdven){
+    if(isset($id) && isset($qtdven))
+        print_r(mysqli_query($_SESSION['db'],   "UPDATE 
+                                                    produtos
+                                                SET 
+                                                    qtdEstoque= (SELECT qtdEstoque FROM produtos WHERE id = ".$id.") - ".$qtdven." 
+                                                WHERE
+                                                    id = ".$id) );
 }

@@ -9,24 +9,47 @@ $descricao = "";
 $id = 0;
 $update = false;
 
+$codven = "";
+$idcli = "";
+$idprod = "";
 $nomecli = "";
-$endercli = "";
-$fonecli = "";
-$emailcli = "";
+$qtdven = "";
+$nomeprod = "";
 
 # recupera o registro para edição
 if (isset($_GET['edit'])) {
-    $idcli = $_GET['edit'];
+    $codven = $_GET['edit'];
     $update = true;
-    $record = mysqli_query($db, "SELECT * FROM vendas WHERE idcli=$idcli");
+
+    $selectVendasEdit = "SELECT
+                            codven,
+                            V.idcli,
+                            V.idprod,
+                            C.nomecli,
+                            P.nome,
+                            V.qtdVen as qtdven
+                        FROM 
+                            vendas as V,
+                            clientes as C,
+                            produtos as P 
+                        WHERE
+                            V.codven = '$codven' AND
+                            V.idcli = C.idcli AND 
+                            V.idprod = P.id";
+
+    //print_r(mysqli_query($db, $selectVendasEdit));
+    $record = mysqli_query($db, $selectVendasEdit);
     # testa o retorno do select e cria o vetor com os registros trazidos
 
     if ($record) {
         $n = mysqli_fetch_array($record);
+
+        $codven = $n['codven'];
+        $idcli = $n['idcli'];
+        $idprod = $n['idprod'];
         $nomecli = $n['nomecli'];
-        $endercli = $n['endercli'];
-        $fonecli = $n['fonecli'];
-        $emailcli = $n['emailcli'];
+        $nomeprod = $n['nome'];
+        $qtdven = $n['qtdven'];
     }
 }
 ?>
@@ -39,7 +62,22 @@ if (isset($_GET['edit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Produtos</title>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/css.css">
+    
+    <!-- ADAPTANDO A FOLHA CSS PARA ESSA PÁGINA PHP -->
+    <style>
+        form{
+            width: auto;
+        };
+
+        #msgQtd{
+            color:red;
+            font-size: .5em;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -59,7 +97,19 @@ if (isset($_GET['edit'])) {
 
     <!-- recupera os registros do banco de dados e exibe na página -->
     <?php 
-        $rsSelect = mysqli_query($db, "SELECT * FROM clientes");
+        $selectVendas = "SELECT codven,
+                            C.nomecli,
+                            P.nome,
+                            V.qtdVen,
+                            V.qtdVen*P.precoUnitario as total
+                        FROM 
+                            vendas as V,
+                            clientes as C,
+                            produtos as P 
+                        WHERE
+                            V.idcli = C.idcli AND V.idprod = P.id";
+
+        $rsSelect = mysqli_query($db, $selectVendas);
     ?>
     <table>
         <thead>
@@ -76,61 +126,214 @@ if (isset($_GET['edit'])) {
         <!-- Início while -->
         <?php while ($rs = mysqli_fetch_array($rsSelect)) { ?>
         <tr>
-            <td><?php echo $rs['idcli']; ?></td>
+            <td><?php echo $rs['codven']; ?></td>
             <td><?php echo $rs['nomecli']; ?></td>
-            <td><?php echo $rs['endercli']?></td>
-            <td><?php echo $rs['fonecli'] ?></td>
-            <td><?php echo $rs['emailcli']?></td>
+            <td><?php echo $rs['nome']?></td>
+            <td><?php echo $rs['qtdVen'] ?></td>
+            <td><?php echo $rs['total']?></td>
 
             <td>
-                <a href="clientes.php?edit=<?php echo $rs['idcli']; ?>" class="edit_btn">Alterar</a>
+                <a href="./vendas.php?edit=<?php echo $rs['codven']; ?>" class="edit_btn">Alterar</a>
             </td>
             <td>
-                <a href="./php/crudClientes.php?del=<?php echo $rs['idcli']; ?>" class="del_btn">Remover</a>
+                <a href="./php/crudVendas.php?del=<?php echo $rs['codven']; ?>" class="del_btn">Remover</a>
             </td>
         </tr>
         <?php } ?>
         <!-- Fim while -->
     </table>
     <!-- ------------------------------------------------------------ -->
+    <div class="container">
+        <div class="row-12">
+                <form method="post" name="form" action="./php/crudVendas.php">
+                    <label>ID da Venda:</label>
+                    <input type="hidden" name="codven" value="<?php echo $codven; ?>"/>
+                    <div class="form-row">
+                        <div class="col-2">
+                            <input type="number" disabled class="form-control" value="<?php echo $codven; ?>">
+                        </div>
+                    </div>
+                    <br>
+                    <label>Cliente</label>
+                    <div class="form-row">
+                        <div class="col-2">
+                            <input type="number" oninput="verCliente();" min="1" class="form-control" id="idcli" name="idcli" placeholder="ID" value="<?php echo $idcli; ?>">
+                        </div>
+                        <div class="col-8">
+                        <input type="text" id="nomecli" class="form-control" disabled placeholder="Cliente" value="<?php echo $nomecli; ?>">
+                        </div>
+                    </div>
+                    <br>
+                    <label>Produto</label>
+                    <div class="form-row">
+                        <div class="col-2">
+                            <input type="number" oninput="verProduto();" name="idprod" id="idprod" min="1" class="form-control" placeholder="ID" value="<?php echo $idprod; ?>">
+                        </div>
+                        <div class="col-8">
+                            <input type="text" id="nomeprod" class="form-control" disabled placeholder="Produto" value="<?php echo $nomeprod; ?>">
+                        </div>
+                        <div class="col-2">
+                            <input type="number" class="form-control" oninput="verQtdEstoque();" id="qtdven" step="1" min="1" name="qtdven" placeholder="Qtd" value="<?php echo $qtdven; ?>">
+                            <p id="msgQtd">
+                            </p>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="form-row">
+                        <div class="col-3">
+                            <?php if ($update == true) : ?>
+                            <button class="btn" type="submit" name="altera" style="background: #556B2F;">Alterar</button>
+                            <?php else : ?>
+                            <button class="btn" type="submit" name="adiciona">Adicionar</button>
+                            <?php endif;?>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-2">
+                            <input type="submit" class="btn" name="close-db" value="VOLTAR AO MENU">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <form method="post" action="./php/crudClientes.php">
-        <!-- campo oculto - contem o id do registro que vai ser atualizado -->
-        <input type="hidden" name="idcli" value="<?php echo $id; ?>">
+    <script>
+        var res;
+        function verCliente(){
+            
+            let id = parseInt(document.getElementById('idcli').value);
+            
+            //console.log(id);
+            
+            if(Number.isInteger(id)){
+                try {
+                    let serverAPi = "http://localhost:8080/LABWEBII/2av/loja/api/validaCliente.php?id=";
+                    let xhr = new XMLHttpRequest();
+                    
+                    console.log(serverAPi+id);
+
+                    xhr.open('GET', serverAPi+id);
+                    xhr.send();
+
+                    xhr.onreadystatechange = () => {
+                        if(xhr.readyState == 4) {
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                if(response.nomecli != null && response.nomecli != undefined){
+                                    document.getElementById('nomecli').style = "color: black;";
+                                    document.getElementById('nomecli').value = response.nomecli;
+                                }else{
+                                    document.getElementById('nomecli').value = "Id não encontrado";
+                                    document.getElementById('nomecli').style = "color: red;";
+                                }
+                                
+                            }
+                        }
+                    };
+                                       
+                } catch (e) {
+                    document.getElementById('nomecli').value = "Sistema fora do ar";
+                    document.getElementById('nomecli').style = "color: red;";
+                }
+
+            }else{
+                document.getElementById('nomecli').value = "Erro: id invalido";
+                document.getElementById('nomecli').style = "color: red;";
+            }
+        }
+
+        function verProduto(){
+            let id = parseInt(document.getElementById('idprod').value);
+            
+            //console.log(id);
+            
+            if(Number.isInteger(id)){
+                try {
+                    let serverAPi = "http://localhost:8080/LABWEBII/2av/loja/api/validaProduto.php?id=";
+                    let xhr = new XMLHttpRequest();
+                    
+                    console.log(serverAPi+id);
+
+                    xhr.open('GET', serverAPi+id);
+                    xhr.send();
+
+                    xhr.onreadystatechange = () => {
+                        if(xhr.readyState == 4) {
+                            console.table(xhr);
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                if(response.nome != null && response.nome != undefined){
+                                    document.getElementById('nomeprod').style = "color: black;";
+                                    document.getElementById('nomeprod').value = response.nome;
+                                }else{
+                                    document.getElementById('nomeprod').value = "Id não encontrado";
+                                    document.getElementById('nomeprod').style = "color: red;";
+                                }
+                                
+                            }
+                        }
+                    };
+                                       
+                } catch (e) {
+                    document.getElementById('nomeprod').value = "Sistema fora do ar";
+                    document.getElementById('nomeprod').style = "color: red;";
+                }
+
+            }else{
+                document.getElementById('nomeprod').value = "Erro: id invalido";
+                document.getElementById('nomeprod').style = "color: red;";
+            }
+            verQtdEstoque();
+        }
         
-        <div class="input-group">
-            <label>Cod.</label>
-            <input type="text" name="nomecli" value="<?php echo $nomecli; ?>">
-        </div>
-        <div class="input-group">
-            <label>Cliente</label>
-            <input type="text" name="endercli" value="<?php echo $endercli; ?>">
-        </div>
-        <div class="input-group">
-            <label>Produto</label>
-            <input type="text" name="fonecli" value="<?php echo $fonecli; ?>">
-        </div>
-        <div class="input-group">
-            <label>Quantidade</label>
-            <input type="text" name="emailcli" value="<?php echo $emailcli; ?>">
-        </div>
-        <div class="input-group">
-            <label>Total</label>
-            <input type="text" name="emailcli" value="<?php echo $emailcli; ?>">
-        </div>
-        <div class="input-group">
-            <!-- <button class="btn" type="submit" name="adiciona">Adicionar</button> -->
-            <?php if ($update == true) : ?>
-            <button class="btn" type="submit" name="altera" style="background: #556B2F;">Alterar</button>
-            <?php else : ?>
-            <button class="btn" type="submit" name="adiciona">Adicionar</button>
-            <?php endif;?>
-        </div>
-        <br><br> <br> <br> <br>
-        <div class="input-group">
-            <a ><input type="submit" class="btn" name="close-db" value="VOLTAR AO MENU"></a>
-        </div>
-    </form>
-</body>
+        function verQtdEstoque(){
+            let id = parseInt(document.getElementById('idprod').value);
+            
+            //console.log(id);
+            
+            if(Number.isInteger(id)){
+                try {
+                    let serverAPi = "http://localhost:8080/LABWEBII/2av/loja/api/validaQtdEstoque.php?id=";
+                    let xhr = new XMLHttpRequest();
+                    
+                    console.log(serverAPi+id);
 
+                    xhr.open('GET', serverAPi+id);
+                    xhr.send();
+
+                    xhr.onreadystatechange = () => {
+                        if(xhr.readyState == 4) {
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                if(response.qtdEstoque != null && response.qtdEstoque != undefined){
+                                    document.getElementById('msgQtd').innerText = "Valor máximo: "+response.qtdEstoque;
+                                    
+                                    if(parseInt(response.qtdEstoque) < parseInt(document.getElementById('qtdven').value)){
+                                        document.getElementById('qtdven').style = "color: red;";
+                                        document.getElementById('msgQtd').style = "color: red;";
+                                    }else{
+                                        document.getElementById('qtdven').style = "color: black;";
+                                        document.getElementById('msgQtd').style = "color: black;";
+                                    }
+                                }else{
+                                    document.getElementById('msgQtd').innerText = " ";
+                                    document.getElementById('qtdven').style = "color: red;";
+                                }
+                                
+                            }
+                        }
+                    };
+                                       
+                } catch (e) {
+                    document.getElementById('msgQtd').innerText = "Sistema fora do ar";
+                    document.getElementById('qtdven').style = "color: red;";
+                }
+
+            }else{
+                document.getElementById('msgQtd').innerText = "Primeiro selecione o produto";
+                document.getElementById('qtdven').style = "color: red;";
+            }
+        }
+    </script>
+</body>
 </html>

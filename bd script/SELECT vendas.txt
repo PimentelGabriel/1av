@@ -1,1 +1,11 @@
-select codven, C.nomecli, P.nome, V.qtdVen, V.qtdVen*P.precoUnitario as total from vendas as V, clientes as C, produtos as P WHERE V.idcli = C.idcli and V.idprod = P.id;
+SELECT codven,
+   C.nomecli,
+   P.nome,
+   V.qtdVen,
+   V.qtdVen*P.precoUnitario as total
+FROM 
+   vendas as V,
+   clientes as C,
+   produtos as P 
+WHERE
+   V.idcli = C.idcli AND V.idprod = P.id;

@@ -27,6 +27,7 @@ if (isset($_GET['edit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Cadastro de Produtos</title>
     <link rel="stylesheet" type="text/css" href="css/css.css">
 </head>
@@ -63,11 +64,11 @@ if (isset($_GET['edit'])) {
         <!-- Início while -->
         <?php while ($rs = mysqli_fetch_array($results)) { ?>
         <tr>
-            <td><?php echo $rs['nomecli']; ?></td>
-            <td><?php echo $rs['endercli']; ?></td>
+            <td><?php echo $rs['nome']; ?></td>
+            <td><?php echo $rs['descricao']; ?></td>
             
-            <td><?php echo $rs['fonecli']?></td>
-            <td><?php echo $rs['emailcli']?></td>
+            <td><?php echo $rs['qtdEstoque']?></td>
+            <td><?php echo $rs['precoUnitario']?></td>
             <td><?php echo $rs['ptoReposicao']?></td>
 
             <td>
