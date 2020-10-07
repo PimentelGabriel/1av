@@ -1,19 +1,19 @@
 <?php
 session_start();
 
-//include('conexao.php');
+include('conexao.php');
 
-$server = 'localhost';
-$user = 'root';
-$psw = '';
-$dbase = 'vendas';
+// $server = 'localhost';
+// $user = 'root';
+// $psw = '';
+// $dbase = 'vendas';
 
-// $server = 'sql313.epizy.com';
-// $user = 'epiz_26890237';
-// $psw = 'TvD58e0zmR5FH88';
-// $dbase = 'epiz_26890237_loja';
+// // $server = 'sql313.epizy.com';
+// // $user = 'epiz_26890237';
+// // $psw = 'TvD58e0zmR5FH88';
+// // $dbase = 'epiz_26890237_loja';
 
-$db = mysqli_connect($server, $user, $psw, $dbase);
+// $db = mysqli_connect($server, $user, $psw, $dbase);
 
 //print_r($db);
 
@@ -40,12 +40,15 @@ if (isset($_POST['adiciona'])) {
     $fonecli = $_POST['fonecli'];
     $emailcli = $_POST['emailcli'];
 
-    if(filter_input(INPUT_POST, 'nomecli') &&
-        filter_input(INPUT_POST, 'endercli') &&
-        filter_input(INPUT_POST, 'fonecli') &&
+    if( filter_input(INPUT_POST, 'nomecli')   &&
+        filter_input(INPUT_POST, 'endercli')  &&
+        filter_input(INPUT_POST, 'fonecli')   &&
         filter_input(INPUT_POST, 'emailcli')
     ){
-        mysqli_query($db, "INSERT INTO clientes (nomecli, endercli, fonecli, emailcli) VALUE ('$nomecli', '$endercli', '$fonecli', '$emailcli')");
+        echo "<pre>";
+        print_r($db);
+        print_r(mysqli_query($db, "INSERT INTO clientes (nomecli, endercli, fonecli, emailcli) VALUE ('$nomecli', '$endercli', '$fonecli', '$emailcli')"));
+        echo "</pre>";
 
         # grava mensagem na sessão
         $_SESSION['message'] = "Cliente adicionado!";
