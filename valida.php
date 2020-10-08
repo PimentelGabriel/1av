@@ -3,9 +3,25 @@ session_start();
 
 include("./conexao/conexaoPDO.php");
 # login e senha preenchidos entra no if para validar
-echo "<pre>";
-    print_r($_POST);
-    echo "<pre>";
+
+//CRIA A TABELA USUÁRIO
+
+$createTable = "CREATE TABLE `usuarios` (
+                    `iduser` int(11) NOT NULL AUTO_INCREMENT,
+                    `usuario` varchar(50) NOT NULL,
+                    `fone` varchar(15) NOT NULL,
+                    `login` varchar(15) NOT NULL,
+                    `senha` varchar(15) NOT NULL,
+                    PRIMARY KEY (`iduser`),
+                    UNIQUE KEY `login` (`login`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;";
+
+try {
+   $conexao->exec($createTable);
+} catch (\Throwable $th) {
+    
+}
+
 if ((isset($_POST['login'])) && (isset($_POST['senha']))) {
     
     # buscar na tabela usuarios o login e senha 

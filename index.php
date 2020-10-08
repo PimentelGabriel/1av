@@ -7,9 +7,12 @@ session_start();
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Loja TADS - Login</title>
+
+    <link href="css/css.css" rel="stylesheet"/>
 </head>
 <body>
     <p><?php
+    if(isset($_SESSION['loginOK']))
     if($_SESSION['loginOK'] == 'Logado'){
         # testa se existe sessão loginErro
         if (isset($_SESSION['loginErro'])) {
@@ -29,8 +32,10 @@ session_start();
         <h2>Loja TADS - Login</h2>
         <label>Login</label>
         <input type="text" name="login" placeholder="Login" required autofocus/>
+        <br><br>
         <label>Senha</label>
         <input type="password" name="senha" placeholder="Senha" required/>
+        <br><br>
         <button type="submit">Entrar</button>
 </body>
 </html>
