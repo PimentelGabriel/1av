@@ -1,5 +1,15 @@
 <?php 
+//session_start();
 include('crud.php');
+
+if($_SESSION['loginOK'] != 'Logado'){
+    # não encontrou
+    # grava sessão loginErro e redireciona o usuário para a página de login
+
+    $_SESSION['loginErro'] = "Seção Desconectada, Digite seu login e senha";
+    header("Location: index.php");
+}
+
 
 
 # recupera o registro para edição
@@ -33,18 +43,18 @@ if (isset($_GET['edit'])) {
 </head>
 
 <body>
-
-    <!-- teste se a sessão existe e exibe sua mensagem -->
-    <?php if (isset($_SESSION['message'])) : ?>
-    <div class="msg">
-        <?php
-            # exibe mensagem da sessão
-            echo $_SESSION['message'];
-            # apaga a sessão
-            unset($_SESSION['message']);
-            ?>
-    </div>
-    <?php endif ?>
+    
+        <!-- teste se a sessão existe e exibe sua mensagem -->
+        <?php if (isset($_SESSION['message'])) : ?>
+            <div class="msg">
+                <?php
+                    # exibe mensagem da sessão
+                    echo $_SESSION['message'];
+                    # apaga a sessão
+                    unset($_SESSION['message']);
+                    ?>
+            </div>
+        <?php endif ?>
     <!-- ------------------------------------------------- -->
 
     <!-- recupera os registros do banco de dados e exibe na página -->
@@ -83,7 +93,7 @@ if (isset($_GET['edit'])) {
     </table>
     <!-- ------------------------------------------------------------ -->
 
-    <form method="post" action="crud.php">
+    <form name="form" method="post" action="crud.php">
         <!-- campo oculto - contem o id do registro que vai ser atualizado -->
         <input type="hidden" name="id" value="<?php echo $id; ?>">
         
@@ -121,11 +131,18 @@ if (isset($_GET['edit'])) {
         </div>
     </form>
     <script>
-        function mudaAction(){
-            document.querySelector("form[action='crud.php']").removeAttribute('action');
-            document.querySelector("form[action='crud.php']").setAttribute('action', 'closeDb.php');
-
+        function limpaCampos(){
+            //alert("AKDUJb");
+            document.getElementByName('form').submit();
         }
+
+        window.onload = setTimeout(() => {
+            try {
+                document.querySelector("body").removeChild(document.querySelector("div[class='msg']"));
+            } catch (error) {
+                return 0;
+            }
+        }, 5000);
     </script>
 </body>
 

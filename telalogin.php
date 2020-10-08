@@ -1,7 +1,5 @@
 <?php
-
 session_start();
-
 # testa se existe sessão loginErro
 if (isset($_SESSION['loginErro'])) {
     # recupera e mostra o valor da sessão loginErro 

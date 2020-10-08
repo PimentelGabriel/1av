@@ -1,15 +1,14 @@
 <?php 
+//include('./php/conexao.php');
+include('./php/crudVendas.php');
 
 if($_SESSION['loginOK'] != 'Logado'){
     # não encontrou
     # grava sessão loginErro e redireciona o usuário para a página de login
 
-    $_SESSION['loginErro'] = "Usuário ou senha Inválido";
+    $_SESSION['loginErro'] = "Seção Desconectada, Digite seu login e senha";
     header("Location: index.php");
 }
-
-//include('./php/conexao.php');
-include('./php/crudVendas.php');
 
 #iniciando variveis
 $nome = "";
@@ -206,6 +205,14 @@ if (isset($_GET['edit'])) {
     </div>
 
     <script>
+        window.onload = setTimeout(() => {
+            try {
+                document.querySelector("body").removeChild(document.querySelector("div[class='msg']"));
+            } catch (error) {
+                return 0;
+            }
+        }, 5000);
+        
         var res;
         function verCliente(){
             

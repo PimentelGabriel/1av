@@ -27,7 +27,7 @@ $ptoReposicao = 0;
 
 if(isset($_POST['close-db'])){
     mysqli_close($db);
-    header('location: loja.html');
+    header('location: loja.php');
 }
 
 # adiciona produto
@@ -81,9 +81,13 @@ if (isset($_POST['altera'])) {
 # remove produto
 if (isset($_GET['del'])) {
     $id = $_GET['del'];
-    mysqli_query($db, "DELETE FROM produtos WHERE id=$id");
-
-    # grava mensagem na sessão
-    $_SESSION['message'] = "Produto removido!";
+    if(mysqli_query($db, "DELETE FROM produtos WHERE id=$id")){
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Produto removido!";
+    }else{
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Erro ao remover produto!\nVerifique se o mesmo está cadastrado em uma venda";
+    }
+    
     header('location: produtos.php');
 }

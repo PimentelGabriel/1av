@@ -85,4 +85,9 @@ form{
     border: 1px solid #3c763d;
     width: 50%;
     text-align: center;
+
+    transition: 0.75s; /* lida por navegadores modernos */
+        -moz-transition: 0.75s; /* para Mozilla antigo */
+        -o-transition: 0.75s; /* para Opera antigo */
+        -webkit-transition: 0.75s; /* para Chrome e similares antigos */
 }

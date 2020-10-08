@@ -1,7 +1,15 @@
 <?php 
-
 //include('./php/conexao.php');
 include('./php/crudClientes.php');
+
+//A seção é iniciada no crud
+if($_SESSION['loginOK'] != 'Logado'){
+    # não encontrou
+    # grava sessão loginErro e redireciona o usuário para a página de login
+
+    $_SESSION['loginErro'] = "Seção Desconectada, Digite seu login e senha";
+    header("Location: index.php");
+}
 
 #iniciando variveis
 $nome = "";
@@ -127,6 +135,15 @@ if (isset($_GET['edit'])) {
             <a ><input type="submit" class="btn" name="close-db" value="VOLTAR AO MENU"></a>
         </div>
     </form>
+    <script>
+        window.onload = setTimeout(() => {
+            try {
+                document.querySelector("body").removeChild(document.querySelector("div[class='msg']"));
+            } catch (error) {
+                return 0;
+            }
+        }, 5000);
+    </script>
 </body>
 
 </html>

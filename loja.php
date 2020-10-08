@@ -1,5 +1,24 @@
 <?php
-  
+  session_start();
+
+  if(isset($_SESSION['loginOK'])){
+    if($_SESSION['loginOK'] != 'Logado'){
+      # não encontrou
+      # grava sessão loginErro e redireciona o usuário para a página de login
+      //http_response_code(404);
+      header("location: index.php");
+
+      $_SESSION['loginErro'] = "Seção Desconectada, Digite seu login e senha";
+    }
+  }else{
+    # não encontrou
+    # grava sessão loginErro e redireciona o usuário para a página de login
+    //http_response_code(404);
+    //header("location: index.php", true, 404);
+    header("location: index.php");
+      
+    $_SESSION['loginErro'] = "Seção Desconectada, Digite seu login e senha";
+  }
 ?>
 
 <!DOCTYPE html>

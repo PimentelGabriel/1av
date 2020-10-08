@@ -36,7 +36,7 @@ $qtdven = "";
 #testa se close db foi acionado
 if(isset($_POST['close-db'])){
     mysqli_close($db);
-    header('location: ../loja.html');
+    header('location: ../loja.php');
 }
 
 # adiciona Venda

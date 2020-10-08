@@ -30,7 +30,7 @@ $ptoReposicao = 0;
 
 if(isset($_POST['close-db'])){
     mysqli_close($db);
-    header('location: ../loja.html');
+    header('location: ../loja.php');
 }
 
 # adiciona Cliente
@@ -55,7 +55,7 @@ if (isset($_POST['adiciona'])) {
     }else{
         $_SESSION['message'] = "Erro: O Cliente não foi adicionado!";
     }
-    //header('location: ../clientes.php');
+    header('location: ../clientes.php');
 }
 
 # altera Cliente
@@ -77,16 +77,21 @@ if (isset($_POST['altera'])) {
         # grava mensagem na sessão
         $_SESSION['message'] = "Erro: O Cliente não foi alterado!";
     }
-    //header('location: ../clientes.php');
+    header('location: ../clientes.php');
 }
 
 # remove Cliente
 if (isset($_GET['del'])) {
     $idcli = $_GET['del'];
-    mysqli_query($db, "DELETE FROM clientes WHERE idcli=$idcli");
-
-    # grava mensagem na sessão
-    $_SESSION['message'] = "Cliente removido!";
+    
+    if(mysqli_query($db, "DELETE FROM clientes WHERE idcli=$idcli")){
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Cliente removido!";
+    }
+    else{
+        # grava mensagem na sessão
+        $_SESSION['message'] = "Erro ao remover cliente!\nIsso pode ocorrer se o cliente estiver cadastrado em uma venda.";
+    }
         
-    //header('location: ../clientes.php');
+    header('location: ../clientes.php');
 }
