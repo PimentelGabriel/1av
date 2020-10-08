@@ -27,7 +27,7 @@ $ptoReposicao = 0;
 
 if(isset($_POST['close-db'])){
     mysqli_close($db);
-    header('location: index.html');
+    header('location: loja.html');
 }
 
 # adiciona produto

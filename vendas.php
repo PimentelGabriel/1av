@@ -1,5 +1,13 @@
 <?php 
 
+if($_SESSION['loginOK'] != 'Logado'){
+    # não encontrou
+    # grava sessão loginErro e redireciona o usuário para a página de login
+
+    $_SESSION['loginErro'] = "Usuário ou senha Inválido";
+    header("Location: index.php");
+}
+
 //include('./php/conexao.php');
 include('./php/crudVendas.php');
 

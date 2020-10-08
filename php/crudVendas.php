@@ -28,7 +28,6 @@ $idcli = "";
 $idprod = "";
 $qtdven = "";
 
-
 // print_r(validaCliente($_GET['a']));
 // echo "<hr>";
 // print_r(validaProduto($_GET['b']));
@@ -37,7 +36,7 @@ $qtdven = "";
 #testa se close db foi acionado
 if(isset($_POST['close-db'])){
     mysqli_close($db);
-    header('location: ../index.html');
+    header('location: ../loja.html');
 }
 
 # adiciona Venda
@@ -88,8 +87,19 @@ if (isset($_POST['altera'])) {
         filter_input(INPUT_POST, 'idprod', FILTER_VALIDATE_INT) &&
         filter_input(INPUT_POST, 'qtdven', FILTER_VALIDATE_INT)
     ){
-        print_r(mysqli_query($db, "UPDATE vendas SET idcli = '$idcli', idprod = '$idprod', qtdVen = '$qtdven' WHERE codven = '$codven'"));
-        $_SESSION['message'] = "Cliente alterado!";
+        if( validaProduto($idprod) == 0 &&
+            validaCliente($idcli) == 0 ){
+            if(verEstoque($idprod, $qtdven)){    
+                updateEstoque($idprod, $qtdven);
+
+                print_r(mysqli_query($db, "UPDATE vendas SET idcli = '$idcli', idprod = '$idprod', qtdVen = '$qtdven' WHERE codven = '$codven'"));
+                $_SESSION['message'] = "Cliente alterado!";
+            }else{
+                $_SESSION['message'] = "Estoque insuficiente!";
+            }
+        }else{
+            $_SESSION['message'] = "Cliente ou produto não cadastrado!";
+        }
     }else{
         # grava mensagem na sessão
         $_SESSION['message'] = "Erro: O Cliente não foi alterado!";
@@ -118,12 +128,23 @@ if (isset($_GET['del'])) {
 
 
 #Atualização do BD quando realizada a venda
-function verEstoque($id){
+
+
+    //echo verEstoque($_GET['a'], $_GET['b']) ? "ok": "no ok";
+    
+
+function verEstoque($id, $qtdven){
     $query = "SELECT qtdEstoque FROM produtos WHERE id =".$id;
     $rsSelect = mysqli_query($_SESSION['db'], $query);
     $rs = mysqli_fetch_array($rsSelect);
+    //print_r($rs[0]);
+
+    //echo (int)$rs[0]." >= ".$qtdven." = ". (((int)$rs[0] >= $qtdven)?true:false);
     
-    return ((int)$rs > $qtdven) ? false : true;
+    if((int)$rs[0] >= $qtdven) return true;
+    else return false;
+    
+    //return ((int)$rs >= $qtdven);
 }
 
 function updateEstoque($id, $qtdven){
